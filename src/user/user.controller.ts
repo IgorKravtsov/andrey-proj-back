@@ -2,13 +2,19 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   NotFoundException,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { UserToken } from './dtos/user-token.dto';
+import { UserDto } from './dtos/user.dto';
+import { AuthGuard } from './guards/auth.guard';
 import { UserService } from './user.service';
 
 @Controller()
@@ -55,4 +61,22 @@ export class UserController {
 
     return { token: jwt_token };
   }
+
+  @UseGuards(AuthGuard)
+  @Get('user')
+  // @Serialize(UserDto)
+  async user(@Req() request: Request): Promise<UserDto> {
+    const user = await this.userService.findOne({ id: request.currentUser.id });
+
+    return this.userService.transformUser(user);
+  }
+
+  // @Post('auth/logout')
+  // async logout(@Res({ passthrough: true }) response: Response) {
+  //   response.clearCookie(USER_IN_COOKIE)
+
+  //   return {
+  //     message: 'Выход выполнен успешно',
+  //   }
+  // }
 }

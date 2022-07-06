@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { UserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 
 @Injectable()
@@ -18,5 +19,12 @@ export class UserService {
 
   async create(data: DeepPartial<User>): Promise<DeepPartial<User> & User> {
     return this.userRepository.save(data);
+  }
+
+  transformUser(user: User): UserDto {
+    return {
+      id: user.id,
+      email: user.email,
+    };
   }
 }
