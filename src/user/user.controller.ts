@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
+import { UpdateEmailDto } from './dtos/update-email.dto';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
 import { UserToken } from './dtos/user-token.dto';
 import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from './guards/auth.guard';
@@ -64,11 +67,48 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('user')
-  // @Serialize(UserDto)
   async user(@Req() request: Request): Promise<UserDto> {
     const user = await this.userService.findOne({ id: request.currentUser.id });
 
     return this.userService.transformUser(user);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('user/update-password')
+  async updatePassword(
+    @Req() request: Request,
+    @Body() body: UpdatePasswordDto,
+  ): Promise<{ message: string }> {
+    const { newPassword, oldPassword } = body;
+    const user = await this.userService.findOne({ id: request.currentUser.id });
+
+    if (user.password !== oldPassword) {
+      throw new BadRequestException('Old password is not match');
+    }
+
+    const res = await this.userService.update(user.id, {
+      ...user,
+      password: newPassword,
+    });
+
+    return res;
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('user/update-email')
+  async updateEmail(
+    @Req() request: Request,
+    @Body() body: UpdateEmailDto,
+  ): Promise<{ message: string }> {
+    const { newEmail } = body;
+    const user = await this.userService.findOne({ id: request.currentUser.id });
+
+    const res = await this.userService.update(user.id, {
+      ...user,
+      email: newEmail,
+    });
+
+    return res;
   }
 
   // @Post('auth/logout')

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { UserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 
@@ -19,6 +20,17 @@ export class UserService {
 
   async create(data: DeepPartial<User>): Promise<DeepPartial<User> & User> {
     return this.userRepository.save(data);
+  }
+
+  async update(
+    id: number,
+    data: QueryDeepPartialEntity<User>,
+  ): Promise<{ message: string }> {
+    const updateResult = await this.userRepository.update(id, data);
+    const res = updateResult
+      ? `User with id ${id} was successfully updated`
+      : 'Error while updating';
+    return { message: res };
   }
 
   transformUser(user: User): UserDto {
