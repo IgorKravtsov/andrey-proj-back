@@ -100,9 +100,11 @@ export class UserController {
     @Req() request: Request,
     @Body() body: UpdateEmailDto,
   ): Promise<{ message: string }> {
+    const { currentUser } = request;
     const { newEmail } = body;
+
     const user = await this.userService.findOne({
-      email: request.currentUser.email,
+      email: newEmail,
     });
 
     if (user) {
@@ -110,7 +112,7 @@ export class UserController {
     }
 
     const res = await this.userService.update(user.id, {
-      ...user,
+      ...currentUser,
       email: newEmail,
     });
 
