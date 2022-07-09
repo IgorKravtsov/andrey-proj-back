@@ -101,7 +101,13 @@ export class UserController {
     @Body() body: UpdateEmailDto,
   ): Promise<{ message: string }> {
     const { newEmail } = body;
-    const user = await this.userService.findOne({ id: request.currentUser.id });
+    const user = await this.userService.findOne({
+      email: request.currentUser.email,
+    });
+
+    if (user) {
+      throw new BadRequestException(`Email ${newEmail} is already exists`);
+    }
 
     const res = await this.userService.update(user.id, {
       ...user,
