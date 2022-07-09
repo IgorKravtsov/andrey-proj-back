@@ -37,6 +37,7 @@ export class UserService {
     return {
       id: user.id,
       email: user.email,
+      photoUrl: user.photoUrl,
     };
   }
 }
