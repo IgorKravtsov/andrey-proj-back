@@ -17,11 +17,11 @@ import { API_HOST, UPLOAD_FILES_FOLDER } from 'src/common/constants';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from 'src/user/guards/auth.guard';
 
-@Controller('upload')
+@Controller()
 export class UploadController {
   constructor(private userService: UserService) {}
 
-  @Post('user-avatar')
+  @Post('upload/user-avatar')
   @UseGuards(AuthGuard)
   @UseInterceptors(
     FileInterceptor('image', {
@@ -51,7 +51,7 @@ export class UploadController {
     };
   }
 
-  @Get(':path')
+  @Get('uploads/:path')
   async getImage(@Param('path') path: string, @Res() res: Response) {
     res.sendFile(path, { root: UPLOAD_FILES_FOLDER });
   }
