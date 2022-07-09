@@ -94,8 +94,8 @@ export class UserController {
     return res;
   }
 
-  @UseGuards(AuthGuard)
   @Put('user/update-email')
+  @UseGuards(AuthGuard)
   async updateEmail(
     @Req() request: Request,
     @Body() body: UpdateEmailDto,
@@ -111,7 +111,7 @@ export class UserController {
       throw new BadRequestException(`Email ${newEmail} is already exists`);
     }
 
-    const res = await this.userService.update(user.id, {
+    const res = await this.userService.update(currentUser.id, {
       ...currentUser,
       email: newEmail,
     });
